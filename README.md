@@ -1,6 +1,7 @@
 # Floating Timer
 
 <a href='https://play.google.com/store/apps/details?id=xyz.tberghuis.floatingtimer'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="200"/></a>
+<a href='https://apt.izzysoft.de/packages/xyz.tberghuis.floatingtimer'><img alt='Get it at IzzyOnDroid' src='https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png' width="200"/></a>
 
 Features both a countdown timer and stopwatch that will float over other apps.
 
