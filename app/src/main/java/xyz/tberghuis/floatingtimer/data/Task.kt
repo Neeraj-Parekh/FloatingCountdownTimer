@@ -4,7 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.compose.ui.graphics.Color
 
+import kotlinx.serialization.Serializable
+
 @Entity(tableName = "tasks")
+@Serializable
 data class Task(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

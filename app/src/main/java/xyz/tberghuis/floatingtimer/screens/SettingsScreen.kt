@@ -255,6 +255,10 @@ fun SettingsScreenContent(
       modifier = Modifier.clickable { navController.navigate("planner") }
     )
     ListItem(
+      headlineContent = { Text("Backup & Restore") },
+      modifier = Modifier.clickable { navController.navigate("backup") }
+    )
+    ListItem(
       headlineContent = { Text("Flash Color") },
       modifier = Modifier
         .clickable {

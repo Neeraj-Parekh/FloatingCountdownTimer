@@ -85,6 +85,9 @@ fun FtNavHost() {
       composable("planner") {
         xyz.tberghuis.floatingtimer.screens.PlannerScreen()
       }
+      composable("backup") {
+        xyz.tberghuis.floatingtimer.screens.DataExportScreen()
+      }
     }
   }
 

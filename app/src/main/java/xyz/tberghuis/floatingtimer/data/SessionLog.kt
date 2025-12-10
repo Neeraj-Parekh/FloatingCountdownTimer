@@ -3,7 +3,10 @@ package xyz.tberghuis.floatingtimer.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+import kotlinx.serialization.Serializable
+
 @Entity(tableName = "session_log")
+@Serializable
 data class SessionLog(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
