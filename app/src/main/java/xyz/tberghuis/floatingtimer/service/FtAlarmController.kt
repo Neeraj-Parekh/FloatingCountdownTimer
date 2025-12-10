@@ -142,15 +142,16 @@ class FtAlarmController(
 
               if (sound == true) {
                 if (customName != null) {
+                    val name = customName // local val for smart cast
                     val customSoundManager = xyz.tberghuis.floatingtimer.service.audio.CustomSoundManager(floatingService.application)
-                    val soundFile = customSoundManager.getSoundFile(customName)
+                    val soundFile = name?.let { customSoundManager.getSoundFile(it) }
                     
                     if (soundFile != null) {
                          floatingService.soundManager.playFile(soundFile, looping ?: true)
                     } else {
                         // Fallback to resource if not found
-                        val resId = floatingService.application.resources.getIdentifier(customName, "raw", floatingService.application.packageName)
-                        if (resId != 0) {
+                        val resId = name?.let { floatingService.application.resources.getIdentifier(it, "raw", floatingService.application.packageName) }
+                        if (resId != null && resId != 0) {
                             floatingService.soundManager.playSound(resId, looping ?: true)
                         }
                     }

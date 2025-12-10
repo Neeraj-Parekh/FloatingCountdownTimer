@@ -55,6 +55,10 @@ import xyz.tberghuis.floatingtimer.openGithubIssues
 import xyz.tberghuis.floatingtimer.openPlayStorePage
 import xyz.tberghuis.floatingtimer.viewmodels.SettingsScreenVm
 import xyz.tberghuis.floatingtimer.viewmodels.SharedVm
+import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
