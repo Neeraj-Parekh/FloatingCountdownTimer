@@ -24,4 +24,10 @@ class SharedVm(application: Application) : AndroidViewModel(application) {
       boundFloatingService.provideService().overlayController.saveTimerPositions()
     }
   }
+
+  fun startTaskTimer() {
+    viewModelScope.launch(IO) {
+      boundFloatingService.provideService().overlayController.addCurrentTaskCountdown()
+    }
+  }
 }

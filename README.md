@@ -3,12 +3,16 @@
 <a href='https://play.google.com/store/apps/details?id=xyz.tberghuis.floatingtimer'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="200"/></a>
 <a href='https://apt.izzysoft.de/packages/xyz.tberghuis.floatingtimer'><img alt='Get it at IzzyOnDroid' src='https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png' width="200"/></a>
 
-Features both a countdown timer and stopwatch that will float over other apps.
-
 * Can be dragged / moved around.
 * Tap to start / pause
 * Double tap to reset
 * Drag to trash to exit
+* **New Features**:
+    * **Always-On Display (AOD)**: Keeps timer visible on lock screen.
+    * **Dark Mode**: System/Light/Dark theme options.
+    * **Visual Styles**: Multiple timer visualizations (Rings, Arcs, Clock Hands).
+    * **Custom Music**: Pick your own audio files and loop them.
+    * **Color Customization**: Primary and Secondary color pickers.
 
 SYSTEM_ALERT_WINDOW uses ComposeView that I got working using hacks discussed
 https://gist.github.com/handstandsam/6ecff2f39da72c0b38c07aa80bbb5a2f

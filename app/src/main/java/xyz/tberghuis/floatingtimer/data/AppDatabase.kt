@@ -9,16 +9,28 @@ import androidx.room.RoomDatabase
 import xyz.tberghuis.floatingtimer.DB_FILENAME
 
 @Database(
-  entities = [SavedCountdown::class, SavedStopwatch::class], version = 4, exportSchema = true,
+  entities = [
+      SavedTimer::class,
+      Reflection::class,
+      Task::class,
+      SessionLog::class
+  ],
+  version = 7,
+  exportSchema = true,
   autoMigrations = [
     AutoMigration(from = 1, to = 2),
     AutoMigration(from = 2, to = 3),
-    AutoMigration(from = 3, to = 4)
+    AutoMigration(from = 3, to = 4),
+    AutoMigration(from = 4, to = 5),
+    AutoMigration(from = 5, to = 6),
+    AutoMigration(from = 6, to = 7)
   ]
 )
 abstract class AppDatabase : RoomDatabase() {
-  abstract fun savedCountdownDao(): SavedCountdownDao
-  abstract fun savedStopwatchDao(): SavedStopwatchDao
+  abstract fun savedTimerDao(): SavedTimerDao
+  abstract fun reflectionDao(): ReflectionDao
+  abstract fun taskDao(): TaskDao
+  abstract fun sessionDao(): SessionDao
 
   companion object {
     @Volatile

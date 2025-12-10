@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.godaddy.android.colorpicker.HsvColor
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -30,21 +32,51 @@ class ColorSettingViewModel(application: Application, savedStateHandle: SavedSta
   // if not null, set previousBackStackEntry color_result
   val timerType: String? = savedStateHandle["timerType"]
 
+  var hexText by mutableStateOf("")
+
   init {
     logd("ColorSettingViewModel timerType $timerType")
 
     viewModelScope.launch {
-      val haloColor = preferences.haloColourFlow.first()
-      colorPickerColorState.value = HsvColor.from(haloColor)
+      val color = when (timerType) {
+        "flash" -> preferences.flashColorFlow.first()
+        "secondary" -> preferences.secondaryColorFlow.first()
+        else -> preferences.haloColourFlow.first()
+      }
+      colorPickerColorState.value = HsvColor.from(color)
+      hexText = String.format("#%06X", (0xFFFFFF and color.toArgb()))
+      
       val scale = preferences.bubbleScaleFlow.first()
-      settingsTimerPreviewVmc = SettingsTimerPreviewVmc(scale, haloColor, "circle", null, false)
+      settingsTimerPreviewVmc = SettingsTimerPreviewVmc(scale, color, "circle", null, false)
       initialised = true
     }
   }
 
+  fun updateHex(newHex: String) {
+    hexText = newHex
+    try {
+        val color = Color(android.graphics.Color.parseColor(newHex))
+        colorPickerColorState.value = HsvColor.from(color)
+    } catch (e: IllegalArgumentException) {
+        // Invalid hex, ignore update to color picker
+    }
+  }
+  
+  fun updateColorFromPicker(hsvColor: HsvColor) {
+      colorPickerColorState.value = hsvColor
+      val color = hsvColor.toColor()
+      hexText = String.format("#%06X", (0xFFFFFF and color.toArgb()))
+  }
+
   fun saveDefaultHaloColor() {
     viewModelScope.launch {
-      preferences.updateHaloColour(colorPickerColorState.value.toColor())
+      if (timerType == "flash") {
+          preferences.updateFlashColor(colorPickerColorState.value.toColor())
+      } else if (timerType == "secondary") {
+          preferences.updateSecondaryColor(colorPickerColorState.value.toColor())
+      } else {
+          preferences.updateHaloColour(colorPickerColorState.value.toColor())
+      }
     }
   }
 

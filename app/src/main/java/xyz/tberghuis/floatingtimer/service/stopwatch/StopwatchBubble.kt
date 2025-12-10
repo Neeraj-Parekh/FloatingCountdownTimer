@@ -15,7 +15,9 @@ import kotlin.concurrent.timerTask
 class Stopwatch(
   service: FloatingService,
   bubbleSizeScaleFactor: Float,
+  bubbleSizeScaleFactor: Float,
   haloColor: Color,
+  secondaryColor: Color,
   timerShape: String,
   label: String?,
   isBackgroundTransparent: Boolean,
@@ -25,6 +27,7 @@ class Stopwatch(
   service,
   bubbleSizeScaleFactor,
   haloColor,
+  secondaryColor,
   timerShape,
   label,
   isBackgroundTransparent,

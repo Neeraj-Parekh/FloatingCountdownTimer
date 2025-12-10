@@ -42,6 +42,13 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
   lateinit var overlayController: OverlayController
 
   lateinit var ftWindowManager: FtWindowManager
+  lateinit var flashOverlayController: FlashOverlayController
+  lateinit var aodOverlayController: AODOverlayController
+  lateinit var audioMaskingPlayer: xyz.tberghuis.floatingtimer.service.audio.AudioMaskingPlayer
+
+  lateinit var taskRepository: xyz.tberghuis.floatingtimer.data.TaskRepository
+  lateinit var sessionRepository: xyz.tberghuis.floatingtimer.data.SessionRepository
+  lateinit var soundManager: SoundManager
 
   private val savedStateRegistryController = SavedStateRegistryController.create(this)
 
@@ -60,6 +67,28 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
     return binder
   }
 
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    ScreenEz.refresh()
+    overlayController.onConfigurationChanged()
+  }
+
+  private val screenReceiver = object : android.content.BroadcastReceiver() {
+      override fun onReceive(context: Context?, intent: Intent?) {
+          when (intent?.action) {
+              Intent.ACTION_SCREEN_OFF -> {
+                  logd("Screen Off")
+                  // check if AOD enabled and show
+                  aodOverlayController.showAODOverlay()
+              }
+              Intent.ACTION_USER_PRESENT -> {
+                  logd("User Present")
+                  aodOverlayController.hideAODOverlay()
+              }
+          }
+      }
+  }
+
   override fun onCreate() {
     super.onCreate()
     ScreenEz.with(this.applicationContext)
@@ -69,8 +98,22 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
 
     ftWindowManager = FtWindowManager(this)
 
+    taskRepository = xyz.tberghuis.floatingtimer.data.TaskRepository.getInstance(application)
+    sessionRepository = xyz.tberghuis.floatingtimer.data.SessionRepository.getInstance(application)
+    soundManager = SoundManager(this)
+
     alarmController = FtAlarmController(this)
     overlayController = OverlayController(this)
+    flashOverlayController = FlashOverlayController(this)
+    aodOverlayController = AODOverlayController(this)
+    audioMaskingPlayer = xyz.tberghuis.floatingtimer.service.audio.AudioMaskingPlayer()
+    
+    val filter = android.content.IntentFilter().apply {
+        addAction(Intent.ACTION_SCREEN_OFF)
+        addAction(Intent.ACTION_USER_PRESENT)
+    }
+    registerReceiver(screenReceiver, filter)
+    
     startInForeground()
   }
 
@@ -92,6 +135,21 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
       }
     }
     return START_NOT_STICKY
+  }
+
+
+
+  fun onTimerStarted() {
+    scope.launch {
+      val enabled = application.preferencesRepository.audioMaskingEnabledFlow.first()
+      if (enabled) {
+        audioMaskingPlayer.playWhiteNoise()
+      }
+    }
+  }
+
+  fun onTimerStopped() {
+    audioMaskingPlayer.stop()
   }
 
   private fun startInForeground() {
@@ -148,14 +206,9 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
   }
 
   override fun onDestroy() {
+    unregisterReceiver(screenReceiver)
     job.cancel()
     super.onDestroy()
-  }
-
-  override fun onConfigurationChanged(newConfig: Configuration) {
-    super.onConfigurationChanged(newConfig)
-    ScreenEz.refresh()
-    overlayController.onConfigurationChanged()
   }
 
   companion object {

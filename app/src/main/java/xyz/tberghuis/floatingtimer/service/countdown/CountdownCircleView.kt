@@ -15,6 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import xyz.tberghuis.floatingtimer.data.preferencesRepository
 import xyz.tberghuis.floatingtimer.composables.SquareBackground
 import xyz.tberghuis.floatingtimer.composables.TimeDisplay
 
@@ -24,18 +27,48 @@ fun CountdownCircleView(
   timeLeftFraction: Float,
   countdownSeconds: Int,
   isPaused: Boolean,
-  isBackgroundTransparent: Boolean
+  isBackgroundTransparent: Boolean,
+  durationSeconds: Int // Passed from View
 ) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  // We need to access preferences. But we are in a Service context (ComposeView).
+  // Provide preferencesRepository from context.
+  val preferences = context.preferencesRepository
+  val visualStyle by preferences.visualStyleFlow.collectAsState(xyz.tberghuis.floatingtimer.data.TimerVisualStyle.DEFAULT)
+
   SquareBackground(
     modifier = Modifier.padding(bubbleProperties.arcWidth / 2),
     background = {
       Box {
-        CountdownProgressArc(
-          timeLeftFraction,
-          bubbleProperties.arcWidth,
-          bubbleProperties.haloColor,
-          isBackgroundTransparent
-        )
+        when (visualStyle) {
+            xyz.tberghuis.floatingtimer.data.TimerVisualStyle.CLOCK_NEEDLE -> {
+                RotatingClockNeedle(durationSeconds, bubbleProperties)
+            }
+            xyz.tberghuis.floatingtimer.data.TimerVisualStyle.KITCHEN_TIMER_ARC -> {
+                CountdownArc(timeLeftFraction, bubbleProperties)
+            }
+            xyz.tberghuis.floatingtimer.data.TimerVisualStyle.IRON_MAN_RINGS -> {
+                IronManTechRings(bubbleProperties)
+            }
+            xyz.tberghuis.floatingtimer.data.TimerVisualStyle.TICK_MARKS -> {
+                ClockFaceWithTicks(timeLeftFraction, bubbleProperties)
+            }
+            xyz.tberghuis.floatingtimer.data.TimerVisualStyle.ASSEMBLE_CLOCK_HAND -> {
+                AssembleClockHand(durationSeconds, bubbleProperties)
+            }
+            xyz.tberghuis.floatingtimer.data.TimerVisualStyle.PARTICLE_CLOCK -> {
+                ParticleClock(timeLeftFraction, bubbleProperties)
+            }
+            else -> {
+                CountdownProgressArc(
+                  timeLeftFraction,
+                  bubbleProperties.arcWidth,
+                  bubbleProperties.haloColor,
+                  isBackgroundTransparent
+                )
+            }
+        }
+        
         if (isPaused) {
           Icon(
             Icons.Filled.PlayArrow,
@@ -52,7 +85,20 @@ fun CountdownCircleView(
         .padding(bubbleProperties.paddingTimerDisplay),
       contentAlignment = Alignment.Center,
     ) {
-      TimeDisplay(countdownSeconds, bubbleProperties.fontSize, isBackgroundTransparent)
+      val label = bubbleProperties.label
+      androidx.compose.foundation.layout.Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+      ) {
+        TimeDisplay(countdownSeconds, bubbleProperties.fontSize, isBackgroundTransparent)
+        if (!label.isNullOrEmpty()) {
+          // TimerText handles outline if transparent
+          xyz.tberghuis.floatingtimer.composables.TimerText(
+             text = label,
+             fontSize = bubbleProperties.fontSize * 0.4,
+             isBackgroundTransparent = isBackgroundTransparent
+          )
+        }
+      }
     }
   }
 }
@@ -79,8 +125,9 @@ fun CountdownProgressArc(
         size = Size(size.width, size.height)
       )
     }
+    // Background Track
     drawArc(
-      color = haloColor.copy(alpha = .1f),
+      color = haloColor.copy(alpha = 0.3f), // Increased visibility
       startAngle = 0f,
       sweepAngle = 360f,
       useCenter = false,

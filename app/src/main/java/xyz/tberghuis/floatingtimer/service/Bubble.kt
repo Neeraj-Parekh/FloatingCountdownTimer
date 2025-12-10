@@ -16,6 +16,7 @@ abstract class Bubble(
   private val service: FloatingService,
   bubbleSizeScaleFactor: Float,
   override val haloColor: Color,
+  override val secondaryColor: Color,
   override val timerShape: String,
   override val label: String? = null,
   override val isBackgroundTransparent: Boolean,

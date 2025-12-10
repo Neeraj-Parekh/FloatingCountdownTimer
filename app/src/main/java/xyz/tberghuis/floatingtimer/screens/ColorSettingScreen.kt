@@ -43,6 +43,7 @@ fun ColorSettingScreen(
   val topBarTitle = when (vm.timerType) {
     "stopwatch" -> stringResource(R.string.stopwatch_timer_color)
     "countdown" -> stringResource(R.string.countdown_timer_color)
+    "secondary" -> "Secondary Color"
     else -> stringResource(R.string.default_timer_color)
   }
 
@@ -99,6 +100,15 @@ fun ColorSettingScreenContent(
           .fillMaxWidth(),
         colorState = vm.colorPickerColorState
       )
+      
+      androidx.compose.material3.OutlinedTextField(
+        value = vm.hexText,
+        onValueChange = { vm.updateHex(it) },
+        label = { Text("Hex Code") },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth()
+      )
+      
       ColorSettingScreenActions()
     }
   }
@@ -108,7 +118,40 @@ fun ColorSettingScreenContent(
     snapshotFlow {
       vm.colorPickerColorState.value
     }.collect {
-      vm.settingsTimerPreviewVmc.haloColor = it.toColor()
+      // Create loop break check?
+      // When picker updates, we want to update preview AND hex text (if not editing hex).
+      // We moved this logic to updateColorFromPicker in VM? 
+      // No, ClassicColorPicker updates the state directly.
+      // So checking changes here is correct.
+      // But updating hexText here while user types hex would cause loop/cursor jump if we are not careful.
+      // VM updateHex updates state.
+      // If we blindly update hexText from state here, it might conflict.
+      // Let's rely on VM to sync hexText only when NOT driven by updateHex? 
+      // Actually, ClassicColorPicker writes to colorPickerColorState.
+      // So we need to sync hexText when that changes.
+      // But if change came from updateHex, hexText is already set.
+      // We can convert back and check equality.
+      
+      val color = it.toColor()
+      vm.settingsTimerPreviewVmc.haloColor = color
+      
+      val newHex = String.format("#%06X", (0xFFFFFF and color.toArgb()))
+      // Only update if significantly different to allow typing?
+      // Or simply: updateHex updates state, state updates hexText.
+      // If user types "#F", state might not be valid, so state doesn't update, hexText stays "#F".
+      // If user types "#FF0000", state updates, this flow triggers, sets hexText to "#FF0000". Consistent.
+      if (vm.hexText.uppercase() != newHex) {
+          // Ideally we check if the color represented by vm.hexText is different from current color
+          // to avoid formatting wars.
+          try {
+             val currentHexColor = Color(android.graphics.Color.parseColor(vm.hexText))
+             if (currentHexColor != color) {
+                 vm.hexText = newHex
+             }
+          } catch(e: Exception) {
+             vm.hexText = newHex
+          }
+      }
     }
   }
 }

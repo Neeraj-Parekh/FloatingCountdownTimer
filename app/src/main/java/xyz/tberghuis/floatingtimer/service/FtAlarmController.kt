@@ -37,6 +37,9 @@ class FtAlarmController(
   private var vibrate: Boolean? = null
   private var sound: Boolean? = null
   private var ringtoneDuration: Long? = null
+  private var customSoundName: String? = null
+  private var flashEnabled: Boolean = false
+  private var flashColor: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Red
 
   init {
     watchFinishedCountdowns()
@@ -58,6 +61,26 @@ class FtAlarmController(
         looping = it
       }
     }
+    floatingService.scope.launch {
+      prefs.customSoundNameFlow.collectLatest {
+        customSoundName = it
+      }
+    }
+    floatingService.scope.launch {
+      prefs.flashEnabledFlow.collectLatest {
+        flashEnabled = it
+      }
+    }
+    floatingService.scope.launch {
+      prefs.flashColorFlow.collectLatest {
+        flashColor = it
+      }
+    }
+  }
+
+  fun stopAlarmFromOverlay() {
+      // Logic to stop alarm
+      alarmRunning.value = false
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -111,8 +134,29 @@ class FtAlarmController(
         alarmRunning.collectLatest { running ->
           when (running) {
             true -> {
+              if (flashEnabled) {
+                  floatingService.flashOverlayController.showFlashOverlay(flashColor)
+              }
+// Imports at top...
+// Add import xyz.tberghuis.floatingtimer.service.audio.CustomSoundManager
+
               if (sound == true) {
-                ringtone?.play()
+                if (customName != null) {
+                    val customSoundManager = xyz.tberghuis.floatingtimer.service.audio.CustomSoundManager(floatingService.application)
+                    val soundFile = customSoundManager.getSoundFile(customName)
+                    
+                    if (soundFile != null) {
+                         floatingService.soundManager.playFile(soundFile, looping ?: true)
+                    } else {
+                        // Fallback to resource if not found
+                        val resId = floatingService.application.resources.getIdentifier(customName, "raw", floatingService.application.packageName)
+                        if (resId != 0) {
+                            floatingService.soundManager.playSound(resId, looping ?: true)
+                        }
+                    }
+                } else {
+                   ringtone?.play()
+                }
               }
               if (vibrate == true) {
                 vibrator.vibrate(
@@ -121,12 +165,18 @@ class FtAlarmController(
                   )
                 )
               }
-              if (sound == false && vibrate == false) {
+              if (sound == false && vibrate == false && !flashEnabled) {
                 alarmRunning.value = false
                 return@collectLatest
               }
-              if (looping == false && ringtoneDuration != null) {
-                // don't need to launch as using collectLatest
+              if (looping == false && ringtoneDuration != null && customSoundName == null && !flashEnabled) {
+                // If flashing is enabled, we probably want to keep going until user dismisses?
+                // The requirement says "Option to toggle flash on/off".
+                // If sound ends but flash is on, should we stop?
+                // Visual alerts usually persist.
+                // For now, if flash is on, we don't auto-stop. User must dismiss.
+                
+                // But if only sound is non-looping and flash is off:
                 delay(ringtoneDuration!!)
                 alarmRunning.value = false
               }
@@ -135,6 +185,8 @@ class FtAlarmController(
             false -> {
               vibrator.cancel()
               ringtone?.stop()
+              floatingService.soundManager.stop()
+              floatingService.flashOverlayController.hideFlashOverlay()
             }
           }
         }
@@ -142,6 +194,8 @@ class FtAlarmController(
         // cancellation exception
         vibrator.cancel()
         ringtone?.stop()
+        floatingService.soundManager.stop()
+        floatingService.flashOverlayController.hideFlashOverlay()
       }
     }
   }

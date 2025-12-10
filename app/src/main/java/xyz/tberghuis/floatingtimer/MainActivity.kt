@@ -17,6 +17,9 @@ import kotlinx.coroutines.launch
 import xyz.tberghuis.floatingtimer.data.preferencesRepository
 import xyz.tberghuis.floatingtimer.iap.billingClientWrapper
 import xyz.tberghuis.floatingtimer.ui.theme.FloatingTimerTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
 
 class MainActivity : ComponentActivity() {
   private fun checkPremium() {
@@ -39,12 +42,22 @@ class MainActivity : ComponentActivity() {
     checkPremium()
     enableEdgeToEdge()
     setContent {
-      FloatingTimerTheme {
+      val themeMode = application.preferencesRepository.themeModeFlow
+          .collectAsState(initial = "system").value
+      
+      val darkTheme = when(themeMode) {
+          "light" -> false
+          "dark" -> true
+          else -> isSystemInDarkTheme()
+      }
+      
+      FloatingTimerTheme(darkTheme = darkTheme) {
         Surface(
           modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(MaterialTheme.colorScheme.background), // Use theme background
         ) {
+            // ...
           FtNavHost()
         }
       }

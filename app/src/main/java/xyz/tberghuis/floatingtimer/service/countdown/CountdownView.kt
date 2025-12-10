@@ -17,7 +17,7 @@ fun CountdownView(countdown: Countdown) {
       timerState.value == TimerStatePaused
     }
   }
-  CountdownView(countdown, timeLeftFraction, countdown.countdownSeconds, isPaused)
+  CountdownView(countdown, timeLeftFraction, countdown.countdownSeconds, isPaused, countdown.durationSeconds)
 }
 
 @Composable
@@ -25,7 +25,8 @@ fun CountdownView(
   bubbleProperties: BubbleProperties,
   timeLeftFraction: Float,
   countdownSeconds: Int,
-  isPaused: Boolean
+  isPaused: Boolean,
+  durationSeconds: Int
 ) {
   when (bubbleProperties.timerShape) {
     "circle" -> {
@@ -34,7 +35,8 @@ fun CountdownView(
         timeLeftFraction = timeLeftFraction,
         countdownSeconds = countdownSeconds,
         isPaused = isPaused,
-        bubbleProperties.isBackgroundTransparent
+        isBackgroundTransparent = bubbleProperties.isBackgroundTransparent,
+        durationSeconds = durationSeconds
       )
     }
 

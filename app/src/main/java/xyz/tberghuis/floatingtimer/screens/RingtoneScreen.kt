@@ -34,6 +34,12 @@ import xyz.tberghuis.floatingtimer.R
 import xyz.tberghuis.floatingtimer.composables.RingtoneTopBar
 import xyz.tberghuis.floatingtimer.data.RingtoneData
 import xyz.tberghuis.floatingtimer.viewmodels.RingtoneScreenVm
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Switch
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @Composable
 fun RingtoneScreen() {
@@ -68,6 +74,88 @@ fun RingtoneScreenContent(
     item { Spacer(Modifier.height(5.dp)) }
     ringtoneList(widthConstraint, context.getString(R.string.alarms), vm.alarmList.ringtoneList, vm)
     item { Spacer(Modifier.height(5.dp)) }
+
+    // Audio Looping Preference
+    val looping by vm.audioLoopingFlow.collectAsState(initial = true)
+    
+    item {
+        Row(
+            widthConstraint,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Loop Audio")
+            Switch(
+                checked = looping,
+                onCheckedChange = { vm.setAudioLooping(it) }
+            )
+        }
+        HorizontalDivider()
+        
+        Spacer(Modifier.height(5.dp))
+    }
+
+    // Custom Sounds
+    item {
+        Column(widthConstraint) {
+            Text(
+                "Custom Sounds",
+                fontWeight = FontWeight.Bold
+            )
+            HorizontalDivider()
+        }
+    }
+    
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            uri?.let { vm.addCustomSound(it) }
+        }
+    )
+    
+    item {
+         Button(
+            onClick = { launcher.launch(arrayOf("audio/*")) },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+        ) {
+            Text("Add Custom Sound")
+        }
+    }
+    
+    items(vm.customSounds) { soundFile ->
+        Row(
+            widthConstraint,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                soundFile.name,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        vm.setCustomSound(soundFile.name)
+                        // TODO: Preview custom sound
+                    },
+                overflow = TextOverflow.Ellipsis,
+                softWrap = false,
+            )
+             Button(
+                onClick = {
+                    vm.setCustomSound(soundFile.name)
+                },
+                contentPadding = PaddingValues(
+                    start = 20.dp,
+                    top = 4.dp,
+                    end = 20.dp,
+                    bottom = 4.dp
+                ),
+            ) {
+                Text(context.getString(R.string.apply))
+            }
+        }
+    }
+    item { Spacer(Modifier.height(5.dp)) }
+
     ringtoneList(
       widthConstraint,
       context.getString(R.string.ringtones), vm.ringtoneList.ringtoneList, vm

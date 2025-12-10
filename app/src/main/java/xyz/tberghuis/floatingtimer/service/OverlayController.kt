@@ -45,11 +45,15 @@ class OverlayController(val service: FloatingService) {
       val bubbleScale = withContext(IO) {
         service.application.preferencesRepository.bubbleScaleFlow.first()
       }
+      val secondaryColor = withContext(IO) {
+        service.application.preferencesRepository.secondaryColorFlow.first()
+      }
       val stopwatch =
         Stopwatch(
           service,
           bubbleScale,
           haloColor,
+          secondaryColor,
           timerShape,
           label,
           isBackgroundTransparent,
@@ -81,11 +85,15 @@ class OverlayController(val service: FloatingService) {
       val bubbleScale = withContext(IO) {
         service.application.preferencesRepository.bubbleScaleFlow.first()
       }
+      val secondaryColor = withContext(IO) {
+        service.application.preferencesRepository.secondaryColorFlow.first()
+      }
       val countdown = Countdown(
         service,
         durationSeconds,
         bubbleScale,
         haloColor,
+        secondaryColor,
         timerShape,
         label,
         isBackgroundTransparent,
@@ -103,9 +111,46 @@ class OverlayController(val service: FloatingService) {
     }
   }
 
+  fun addCurrentTaskCountdown() {
+      service.scope.launch {
+          val task = service.taskRepository.getCurrentTask() ?: return@launch
+          
+          val bubbleScale = withContext(IO) {
+              service.application.preferencesRepository.bubbleScaleFlow.first()
+          }
+          val secondaryColor = withContext(IO) {
+              service.application.preferencesRepository.secondaryColorFlow.first()
+          }
+          
+          val countdown = Countdown(
+              service,
+              task.durationSeconds,
+              bubbleScale,
+              Color(task.color),
+              secondaryColor,
+              "circle", // default shape
+              task.name,
+              false, // background transparent?
+              null,
+              false,
+              isTaskMode = true
+          )
+          
+          val countdownView = @Composable {
+              CompositionLocalProvider(LocalTimerViewHolder provides countdown.viewHolder) {
+                  CountdownView(countdown)
+              }
+          }
+          withContext(Main) {
+              addBubble(countdown, countdownView)
+          }
+      }
+  }
+
   private fun addBubble(bubble: Bubble, bubbleView: @Composable () -> Unit) {
     logd("OverlayController addBubble")
     bubbleSet.add(bubble)
+    service.onTimerStarted()
 
     bubble.viewHolder.view.setContent {
       bubbleView()
@@ -117,6 +162,7 @@ class OverlayController(val service: FloatingService) {
         bubble.exit()
         bubbleSet.remove(bubble)
         if (bubbleSet.isEmpty()) {
+          service.onTimerStopped()
           service.stopSelf()
         }
       },
@@ -233,6 +279,7 @@ class OverlayController(val service: FloatingService) {
     bubbleSet.forEach { bubble ->
       bubble.exit()
     }
+    service.onTimerStopped() // Stop noise
     service.stopSelf()
   }
 

@@ -13,7 +13,7 @@ class SettingsScreenVm(
   private val prefs = application.preferencesRepository
 
   val currentRingtoneVmc =
-    CurrentRingtoneVmc(prefs.alarmRingtoneUriFlow, viewModelScope, application)
+    CurrentRingtoneVmc(prefs.alarmRingtoneUriFlow, prefs.customSoundNameFlow, viewModelScope, application)
 
   val loopingFlow = prefs.loopingFlow
   val haloColourFlow = prefs.haloColourFlow
@@ -30,5 +30,52 @@ class SettingsScreenVm(
     viewModelScope.launch {
       prefs.updateAutoStart(value)
     }
+  }
+  
+  val flashEnabledFlow = prefs.flashEnabledFlow
+  val flashColorFlow = prefs.flashColorFlow
+  val visualStyleFlow = prefs.visualStyleFlow
+
+  fun updateFlashEnabled(value: Boolean) {
+    viewModelScope.launch {
+      prefs.updateFlashEnabled(value)
+    }
+  }
+  
+  fun updateVisualStyle(style: xyz.tberghuis.floatingtimer.data.TimerVisualStyle) {
+    viewModelScope.launch {
+        prefs.updateVisualStyle(style)
+    }
+  }
+
+  val secondaryColorFlow = prefs.secondaryColorFlow
+
+  fun updateSecondaryColor(color: androidx.compose.ui.graphics.Color) {
+    viewModelScope.launch {
+        prefs.updateSecondaryColor(color)
+    }
+  }
+
+  val aodEnabledFlow = prefs.aodEnabledFlow
+  val themeModeFlow = prefs.themeModeFlow
+
+  fun updateAodEnabled(enabled: Boolean) {
+    viewModelScope.launch {
+        prefs.updateAodEnabled(enabled)
+    }
+  }
+
+  fun updateThemeMode(mode: String) {
+    viewModelScope.launch {
+        prefs.updateThemeMode(mode)
+    }
+  }
+
+  val audioMaskingEnabledFlow = prefs.audioMaskingEnabledFlow
+  
+  fun updateAudioMaskingEnabled(enabled: Boolean) {
+      viewModelScope.launch {
+          prefs.updateAudioMaskingEnabled(enabled)
+      }
   }
 }

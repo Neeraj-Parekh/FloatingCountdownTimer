@@ -14,6 +14,7 @@ interface BubbleProperties {
   val arcWidth: Dp
   val fontSize: TextUnit
   val haloColor: Color
+  val secondaryColor: Color
   val timerShape: String
   val label: String?
   val isBackgroundTransparent: Boolean

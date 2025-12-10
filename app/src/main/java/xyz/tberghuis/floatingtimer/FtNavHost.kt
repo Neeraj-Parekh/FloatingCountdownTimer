@@ -11,7 +11,9 @@ import xyz.tberghuis.floatingtimer.composables.GrantOverlayDialog
 import xyz.tberghuis.floatingtimer.screens.ColorSettingScreen
 import xyz.tberghuis.floatingtimer.screens.CountdownScreen
 import xyz.tberghuis.floatingtimer.screens.SizeSettingScreen
+import xyz.tberghuis.floatingtimer.screens.SizeSettingScreen
 import xyz.tberghuis.floatingtimer.screens.StopwatchScreen
+import xyz.tberghuis.floatingtimer.screens.ReflectionScreen
 import xyz.tberghuis.floatingtimer.viewmodels.CountdownScreenVm
 import xyz.tberghuis.floatingtimer.viewmodels.StopwatchScreenVm
 import android.Manifest
@@ -70,6 +72,18 @@ fun FtNavHost() {
       }
       composable("settings") {
         SettingsScreen()
+      }
+      composable("reflection") {
+        ReflectionScreen()
+      }
+      composable("tasks") {
+        xyz.tberghuis.floatingtimer.screens.TaskScreen()
+      }
+      composable("stats") {
+        xyz.tberghuis.floatingtimer.screens.StatsScreen()
+      }
+      composable("planner") {
+        xyz.tberghuis.floatingtimer.screens.PlannerScreen()
       }
     }
   }

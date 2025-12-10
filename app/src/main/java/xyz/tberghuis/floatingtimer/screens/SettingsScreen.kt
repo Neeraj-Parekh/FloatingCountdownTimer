@@ -215,9 +215,204 @@ fun SettingsScreenContent(
       modifier = Modifier.clickable {
         sharedVm.saveTimerPositions()
       })
+      
+    ListItem(
+      headlineContent = { Text("End-of-Day Reflection") },
+      supportingContent = { Text("Journal your productivity") },
+      modifier = Modifier.clickable {
+        navController.navigate("reflection")
+      })
+
+    HorizontalDivider()
+    Text(
+      "Screen Flash",
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.dp)
+        .padding(horizontal = 16.dp),
+      color = MaterialTheme.colorScheme.primary,
+    )
+    val flashEnabled by vm.flashEnabledFlow.collectAsState(false)
+    val flashColor by vm.flashColorFlow.collectAsState(Color.Red)
+    
+    ListItem(
+      headlineContent = { Text("Enable Screen Flash") },
+      trailingContent = {
+        Switch(
+          checked = flashEnabled,
+          onCheckedChange = {
+            vm.updateFlashEnabled(it)
+          },
+        )
+      },
+    )
+    ListItem(
+      headlineContent = { Text("Statistics") },
+      modifier = Modifier.clickable { navController.navigate("stats") }
+    )
+    ListItem(
+      headlineContent = { Text("Visual Planner") },
+      modifier = Modifier.clickable { navController.navigate("planner") }
+    )
+    ListItem(
+      headlineContent = { Text("Flash Color") },
+      modifier = Modifier
+        .clickable {
+          navController.navigate("change_color/flash")
+        },
+      trailingContent = {
+        Icon(
+          Icons.Filled.Circle,
+          contentDescription = "color",
+          modifier = Modifier.size(35.dp),
+          tint = flashColor
+        )
+      },
+    )
+
+    val secondaryColor by vm.secondaryColorFlow.collectAsState(Color.Cyan)
+    ListItem(
+      headlineContent = { Text("Change Secondary Color") },
+      supportingContent = { Text("Accent color for visual styles") },
+      modifier = Modifier.clickable {
+        navController.navigate("change_color/secondary")
+      },
+      trailingContent = {
+        Icon(
+          Icons.Filled.Circle,
+          contentDescription = "color",
+          modifier = Modifier.size(35.dp),
+          tint = secondaryColor // Use Collected State
+        )
+      },
+    )
+    
+    val visualStyle by vm.visualStyleFlow.collectAsState(xyz.tberghuis.floatingtimer.data.TimerVisualStyle.DEFAULT)
+    var expanded by remember { mutableStateOf(false) }
+
+    ListItem(
+      headlineContent = { Text("Timer Visual Style") },
+      trailingContent = {
+        Box {
+            Text(
+                visualStyle.name,
+                modifier = Modifier
+                    .clickable { expanded = true }
+                    .padding(8.dp)
+            )
+            androidx.compose.material3.DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                xyz.tberghuis.floatingtimer.data.TimerVisualStyle.values().forEach { style ->
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(style.name) },
+                        onClick = {
+                            vm.updateVisualStyle(style)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+      }
+    )
+    ListItem(
+      headlineContent = { Text("Manage Tasks") },
+      supportingContent = { Text("Add/Edit Brain Dump tasks") },
+      modifier = Modifier.clickable {
+        navController.navigate("tasks")
+      })
+
+    ListItem(
+      headlineContent = { Text("Start Task Mode (Demo)") },
+      supportingContent = { Text("Starts the task list sequence") },
+      modifier = Modifier.clickable {
+        sharedVm.startTaskTimer()
+      })
+
+    // Theme and AOD
+    HorizontalDivider()
+    Text(
+      "Display",
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.dp)
+        .padding(horizontal = 16.dp),
+      color = MaterialTheme.colorScheme.primary,
+    )
+
+    val themeMode by vm.themeModeFlow.collectAsState("system")
+    var themeExpanded by remember { mutableStateOf(false) }
+
+    ListItem(
+        headlineContent = { Text("App Theme") },
+        trailingContent = {
+            Box {
+                Text(
+                    themeMode.replaceFirstChar { it.uppercase() },
+                    modifier = Modifier
+                        .clickable { themeExpanded = true }
+                        .padding(8.dp)
+                )
+                androidx.compose.material3.DropdownMenu(
+                    expanded = themeExpanded,
+                    onDismissRequest = { themeExpanded = false }
+                ) {
+                    listOf("system", "light", "dark").forEach { mode ->
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(mode.replaceFirstChar { it.uppercase() }) },
+                            onClick = {
+                                vm.updateThemeMode(mode)
+                                themeExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    )
+
+    val aodEnabled by vm.aodEnabledFlow.collectAsState(false)
+    ListItem(
+      headlineContent = { Text("Enable AOD (Always-On Display)") },
+      supportingContent = { Text("Show timer overlay on lock screen (Beta)") },
+      trailingContent = {
+        Switch(
+          checked = aodEnabled,
+          onCheckedChange = {
+            vm.updateAodEnabled(it)
+          },
+        )
+      },
+    )
 
 
 
+
+    HorizontalDivider()
+    Text(
+      "Audio Masking",
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.dp)
+        .padding(horizontal = 16.dp),
+      color = MaterialTheme.colorScheme.primary,
+    )
+    val audioMaskingEnabled by vm.audioMaskingEnabledFlow.collectAsState(false)
+    
+    ListItem(
+      headlineContent = { Text("Enable White Noise") },
+      supportingContent = { Text("Play masking sound during timer (Beta)") },
+      trailingContent = {
+        Switch(
+          checked = audioMaskingEnabled,
+          onCheckedChange = {
+            vm.updateAudioMaskingEnabled(it)
+          },
+        )
+      },
+    )
 
     HorizontalDivider()
     Text(

@@ -106,6 +106,20 @@ class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
     }
   }
 
+  val customSoundNameFlow: Flow<String?> = dataStore.data.map { preferences ->
+    preferences[stringPreferencesKey("custom_sound_name")]
+  }
+
+  suspend fun updateCustomSoundName(name: String?) {
+    dataStore.edit { preferences ->
+      if (name == null) {
+        preferences.remove(stringPreferencesKey("custom_sound_name"))
+      } else {
+        preferences[stringPreferencesKey("custom_sound_name")] = name
+      }
+    }
+  }
+
   val loopingFlow: Flow<Boolean> = dataStore.data.map { preferences ->
     preferences[booleanPreferencesKey("looping")] ?: true
   }
@@ -133,6 +147,100 @@ class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
       instance ?: synchronized(this) {
         instance ?: PreferencesRepository(context.dataStore).also { instance = it }
       }
+  }
+
+  val flashEnabledFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+    preferences[booleanPreferencesKey("flash_enabled")] ?: false
+  }
+
+  suspend fun updateFlashEnabled(enabled: Boolean) {
+    dataStore.edit { preferences ->
+        preferences[booleanPreferencesKey("flash_enabled")] = enabled
+    }
+  }
+
+  val flashColorFlow: Flow<Color> = dataStore.data.map { preferences ->
+    val colorString = preferences[stringPreferencesKey("flash_color")]
+    if (colorString == null) Color.Red else Color(colorString.toULong())
+  }
+
+  suspend fun updateFlashColor(color: Color) {
+    dataStore.edit { preferences ->
+      preferences[stringPreferencesKey("flash_color")] = color.value.toString()
+    }
+  }
+
+  val visualStyleFlow: Flow<TimerVisualStyle> = dataStore.data.map { preferences ->
+    val styleName = preferences[stringPreferencesKey("visual_style")]
+    if (styleName != null) {
+        try {
+            TimerVisualStyle.valueOf(styleName)
+        } catch (e: IllegalArgumentException) {
+            TimerVisualStyle.DEFAULT
+        }
+    } else {
+        TimerVisualStyle.DEFAULT
+    }
+  }
+
+  suspend fun updateVisualStyle(style: TimerVisualStyle) {
+    dataStore.edit { preferences ->
+      preferences[stringPreferencesKey("visual_style")] = style.name
+    }
+  }
+
+  val secondaryColorFlow: Flow<Color> = dataStore.data.map { preferences ->
+    val colorString = preferences[stringPreferencesKey("secondary_color")]
+    if (colorString == null) Color.Cyan else Color(colorString.toULong())
+  }
+
+  suspend fun updateSecondaryColor(color: Color) {
+    dataStore.edit { preferences ->
+      preferences[stringPreferencesKey("secondary_color")] = color.value.toString()
+    }
+  }
+
+  val audioLoopingFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+    preferences[booleanPreferencesKey("audio_looping")] ?: true // Default to true
+  }
+
+  suspend fun updateAudioLooping(loop: Boolean) {
+    dataStore.edit { preferences ->
+      preferences[booleanPreferencesKey("audio_looping")] = loop
+    }
+  }
+
+  // AOD
+  val aodEnabledFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+    preferences[booleanPreferencesKey("aod_enabled")] ?: false
+  }
+
+  suspend fun updateAodEnabled(enabled: Boolean) {
+    dataStore.edit { preferences ->
+        preferences[booleanPreferencesKey("aod_enabled")] = enabled
+    }
+  }
+
+  // Theme: "system", "light", "dark"
+  val themeModeFlow: Flow<String> = dataStore.data.map { preferences ->
+    preferences[stringPreferencesKey("theme_mode")] ?: "system"
+  }
+
+  suspend fun updateThemeMode(mode: String) {
+    dataStore.edit { preferences ->
+        preferences[stringPreferencesKey("theme_mode")] = mode
+    }
+  }
+  
+  // Audio Masking
+  val audioMaskingEnabledFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+    preferences[booleanPreferencesKey("audio_masking_enabled")] ?: false
+  }
+
+  suspend fun updateAudioMaskingEnabled(enabled: Boolean) {
+    dataStore.edit { preferences ->
+      preferences[booleanPreferencesKey("audio_masking_enabled")] = enabled
+    }
   }
 }
 
