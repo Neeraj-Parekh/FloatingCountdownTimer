@@ -36,9 +36,24 @@ class MainActivity : ComponentActivity() {
     }
   }
 
+  private fun requestBatteryOptimizationExemption() {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        val packageName = packageName
+        val pm = getSystemService(android.content.Context.POWER_SERVICE) as android.os.PowerManager
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+            val intent = android.content.Intent().apply {
+                action = android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                data = android.net.Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+        }
+    }
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     logd("onCreate")
+    requestBatteryOptimizationExemption()
     checkPremium()
     enableEdgeToEdge()
     setContent {

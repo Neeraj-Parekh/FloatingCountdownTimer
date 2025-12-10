@@ -134,12 +134,42 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
         else -> {}
       }
     }
-    return START_NOT_STICKY
+    return START_STICKY
   }
 
+  private var wakeLock: android.os.PowerManager.WakeLock? = null
 
+  private fun acquireWakeLock() {
+    val powerManager = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+    wakeLock = powerManager.newWakeLock(
+        android.os.PowerManager.PARTIAL_WAKE_LOCK,
+        "FloatingTimer::WakeLock"
+    )
+    wakeLock?.acquire(10*60*1000L /*10 minutes*/)
+  }
+
+  private fun releaseWakeLock() {
+      if (wakeLock?.isHeld == true) {
+          wakeLock?.release()
+      }
+  }
+
+  override fun onTaskRemoved(rootIntent: Intent?) {
+    val restartIntent = Intent(applicationContext, this::class.java)
+    val pendingIntent = PendingIntent.getService(
+        this, 1, restartIntent, PendingIntent.FLAG_IMMUTABLE
+    )
+    val alarmManager = getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+    alarmManager.set(
+        android.app.AlarmManager.ELAPSED_REALTIME,
+        android.os.SystemClock.elapsedRealtime() + 1000,
+        pendingIntent
+    )
+    super.onTaskRemoved(rootIntent)
+  }
 
   fun onTimerStarted() {
+    acquireWakeLock()
     scope.launch {
       val enabled = application.preferencesRepository.audioMaskingEnabledFlow.first()
       if (enabled) {
@@ -150,6 +180,7 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
 
   fun onTimerStopped() {
     audioMaskingPlayer.stop()
+    releaseWakeLock()
   }
 
   private fun startInForeground() {

@@ -269,7 +269,24 @@ class OverlayController(val service: FloatingService) {
     }
   }
 
+  private var lastWidth = ScreenEz.safeWidth
+  private var lastHeight = ScreenEz.safeHeight
+
   fun onConfigurationChanged() {
+    val newWidth = ScreenEz.safeWidth
+    val newHeight = ScreenEz.safeHeight
+
+    if (lastWidth > 0 && lastHeight > 0) {
+      bubbleSet.forEach { bubble ->
+        val params = bubble.viewHolder.params
+        params.x = (params.x.toFloat() / lastWidth * newWidth).toInt()
+        params.y = (params.y.toFloat() / lastHeight * newHeight).toInt()
+        // updateClickTargetParamsWithinScreenBounds will apply the update
+      }
+    }
+    lastWidth = newWidth
+    lastHeight = newHeight
+
     bubbleSet.forEach {
       updateClickTargetParamsWithinScreenBounds(it.viewHolder)
     }
