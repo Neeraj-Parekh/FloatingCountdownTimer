@@ -78,7 +78,7 @@ fun <T : SavedTimer> ColumnScope.SavedTimersCard(
         ) {
           when (savedTimer) {
             is SavedCountdown -> {
-              CountdownView(settingsTimerPreviewVmc, 1f, savedTimer.durationSeconds, false)
+              CountdownView(settingsTimerPreviewVmc, 1f, savedTimer.durationSeconds, false, savedTimer.durationSeconds)
             }
 
             is SavedStopwatch -> {

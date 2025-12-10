@@ -21,6 +21,9 @@ import com.torrydo.screenez.ScreenEz
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collect
 import xyz.tberghuis.floatingtimer.FOREGROUND_SERVICE_NOTIFICATION_ID
 import xyz.tberghuis.floatingtimer.INTENT_COMMAND
 import xyz.tberghuis.floatingtimer.INTENT_COMMAND_EXIT
@@ -35,7 +38,6 @@ import xyz.tberghuis.floatingtimer.logd
 // https://stackoverflow.com/questions/76503237/how-to-use-jetpack-compose-in-service
 class FloatingService : LifecycleService(), SavedStateRegistryOwner {
   private val job = SupervisorJob()
-
   val scope = CoroutineScope(Dispatchers.Main + job)
 
   lateinit var alarmController: FtAlarmController
@@ -115,6 +117,16 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
     registerReceiver(screenReceiver, filter)
     
     startInForeground()
+
+    // Observe preferences
+    scope.launch {
+      application.preferencesRepository.audioMaskingEnabledFlow.collect { enabled ->
+          // if disabled, stop any playing masking
+          if (!enabled) {
+              audioMaskingPlayer.stop()
+          }
+      }
+    }
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
