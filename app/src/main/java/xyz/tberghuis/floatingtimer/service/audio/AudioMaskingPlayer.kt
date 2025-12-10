@@ -7,7 +7,9 @@ import android.os.Build
 import xyz.tberghuis.floatingtimer.logd
 import kotlin.random.Random
 
-class AudioMaskingPlayer {
+import android.content.Context
+
+class AudioMaskingPlayer(private val context: Context) {
     private var audioTrack: AudioTrack? = null
     private var isPlaying = false
     private val sampleRate = 44100

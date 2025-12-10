@@ -49,6 +49,7 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
   lateinit var audioMaskingPlayer: xyz.tberghuis.floatingtimer.service.audio.AudioMaskingPlayer
 
   lateinit var taskRepository: xyz.tberghuis.floatingtimer.data.TaskRepository
+  lateinit var preferencesRepository: xyz.tberghuis.floatingtimer.data.PreferencesRepository
   lateinit var sessionRepository: xyz.tberghuis.floatingtimer.data.SessionRepository
   lateinit var soundManager: SoundManager
 
@@ -101,6 +102,7 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
     ftWindowManager = FtWindowManager(this)
 
     taskRepository = xyz.tberghuis.floatingtimer.data.TaskRepository.getInstance(application)
+    preferencesRepository = xyz.tberghuis.floatingtimer.data.PreferencesRepository.getInstance(application)
     sessionRepository = xyz.tberghuis.floatingtimer.data.SessionRepository.getInstance(application)
     soundManager = SoundManager(this)
 
@@ -108,7 +110,7 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
     overlayController = OverlayController(this)
     flashOverlayController = FlashOverlayController(this)
     aodOverlayController = AODOverlayController(this)
-    audioMaskingPlayer = xyz.tberghuis.floatingtimer.service.audio.AudioMaskingPlayer()
+    audioMaskingPlayer = xyz.tberghuis.floatingtimer.service.audio.AudioMaskingPlayer(this)
     
     val filter = android.content.IntentFilter().apply {
         addAction(Intent.ACTION_SCREEN_OFF)
