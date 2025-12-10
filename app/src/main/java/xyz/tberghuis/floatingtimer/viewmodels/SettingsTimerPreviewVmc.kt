@@ -16,6 +16,7 @@ class SettingsTimerPreviewVmc(
   override val isBackgroundTransparent: Boolean
 ) : BubbleProperties {
   var bubbleSizeScaleFactor by mutableFloatStateOf(initialScale) // 0<=x<=1
+  override val secondaryColor: Color = Color.White
   override var haloColor by mutableStateOf(initialHaloColor)
   override val arcWidth by derivedStateOf {
     BubbleProperties.calcArcWidth(bubbleSizeScaleFactor)

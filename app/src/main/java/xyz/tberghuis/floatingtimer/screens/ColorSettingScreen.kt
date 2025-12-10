@@ -32,6 +32,9 @@ import xyz.tberghuis.floatingtimer.R
 import xyz.tberghuis.floatingtimer.composables.ColorSettingScreenActions
 import xyz.tberghuis.floatingtimer.composables.SettingsTimerPreviewCard
 import xyz.tberghuis.floatingtimer.viewmodels.ColorSettingViewModel
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import android.graphics.Color as AndroidColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

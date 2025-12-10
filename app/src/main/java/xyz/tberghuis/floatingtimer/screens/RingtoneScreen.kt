@@ -62,6 +62,16 @@ fun RingtoneScreenContent(
     .widthIn(max = 350.dp)
     .fillMaxWidth()
 
+  // Audio Looping Preference
+  val looping by vm.audioLoopingFlow.collectAsState(initial = true)
+
+  val launcher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.OpenDocument(),
+    onResult = { uri ->
+      uri?.let { vm.addCustomSound(it) }
+    }
+  )
+
   LazyColumn(
     modifier = Modifier
       .padding(padding)
@@ -75,9 +85,6 @@ fun RingtoneScreenContent(
     ringtoneList(widthConstraint, context.getString(R.string.alarms), vm.alarmList.ringtoneList, vm)
     item { Spacer(Modifier.height(5.dp)) }
 
-    // Audio Looping Preference
-    val looping by vm.audioLoopingFlow.collectAsState(initial = true)
-    
     item {
         Row(
             widthConstraint,
@@ -105,13 +112,6 @@ fun RingtoneScreenContent(
             HorizontalDivider()
         }
     }
-    
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-        onResult = { uri ->
-            uri?.let { vm.addCustomSound(it) }
-        }
-    )
     
     item {
          Button(

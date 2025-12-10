@@ -18,6 +18,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 import xyz.tberghuis.floatingtimer.service.BubbleProperties
+import androidx.compose.ui.graphics.drawscope.rotate
 
 @Composable
 fun RotatingClockNeedle(

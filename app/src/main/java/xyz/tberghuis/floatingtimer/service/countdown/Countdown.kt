@@ -164,11 +164,12 @@ class Countdown(
                 }
 
                 if (isTaskMode) {
-                   service.taskRepository.moveNext()
-                   val nextTask = service.taskRepository.getCurrentTask()
-                   if (nextTask != null) {
-                     updateTask(nextTask)
-                     // ...
+                   service.scope.launch {
+                       service.taskRepository.moveNext()
+                       val nextTask = service.taskRepository.getCurrentTask()
+                       if (nextTask != null) {
+                         updateTask(nextTask)
+                       }
                    }
                 }
               }

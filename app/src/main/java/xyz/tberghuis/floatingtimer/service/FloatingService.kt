@@ -36,7 +36,7 @@ import xyz.tberghuis.floatingtimer.logd
 class FloatingService : LifecycleService(), SavedStateRegistryOwner {
   private val job = SupervisorJob()
 
-  val scope = CoroutineScope(Dispatchers.IO + job)
+  val scope = CoroutineScope(Dispatchers.Main + job)
 
   lateinit var alarmController: FtAlarmController
   lateinit var overlayController: OverlayController

@@ -95,6 +95,15 @@ fun SettingsScreenContent(
   val purchased by vm.haloColourPurchasedFlow.collectAsState(null)
   val context = LocalContext.current
 
+  // Hoisted states
+  val flashEnabled by vm.flashEnabledFlow.collectAsState(false)
+  val flashColor by vm.flashColorFlow.collectAsState(Color.Red)
+  val secondaryColor by vm.secondaryColorFlow.collectAsState(Color.Cyan)
+  val visualStyle by vm.visualStyleFlow.collectAsState(xyz.tberghuis.floatingtimer.data.TimerVisualStyle.DEFAULT)
+  val themeMode by vm.themeModeFlow.collectAsState("system")
+  val aodEnabled by vm.aodEnabledFlow.collectAsState(false)
+  val audioMaskingEnabled by vm.audioMaskingEnabledFlow.collectAsState(false)
+
   Column(
     modifier = Modifier
       .consumeWindowInsets(padding)
@@ -232,8 +241,6 @@ fun SettingsScreenContent(
         .padding(horizontal = 16.dp),
       color = MaterialTheme.colorScheme.primary,
     )
-    val flashEnabled by vm.flashEnabledFlow.collectAsState(false)
-    val flashColor by vm.flashColorFlow.collectAsState(Color.Red)
     
     ListItem(
       headlineContent = { Text("Enable Screen Flash") },
@@ -274,7 +281,6 @@ fun SettingsScreenContent(
       },
     )
 
-    val secondaryColor by vm.secondaryColorFlow.collectAsState(Color.Cyan)
     ListItem(
       headlineContent = { Text("Change Secondary Color") },
       supportingContent = { Text("Accent color for visual styles") },
@@ -286,12 +292,11 @@ fun SettingsScreenContent(
           Icons.Filled.Circle,
           contentDescription = "color",
           modifier = Modifier.size(35.dp),
-          tint = secondaryColor // Use Collected State
+          tint = secondaryColor
         )
       },
     )
     
-    val visualStyle by vm.visualStyleFlow.collectAsState(xyz.tberghuis.floatingtimer.data.TimerVisualStyle.DEFAULT)
     var expanded by remember { mutableStateOf(false) }
 
     ListItem(
@@ -346,7 +351,6 @@ fun SettingsScreenContent(
       color = MaterialTheme.colorScheme.primary,
     )
 
-    val themeMode by vm.themeModeFlow.collectAsState("system")
     var themeExpanded by remember { mutableStateOf(false) }
 
     ListItem(
@@ -377,7 +381,6 @@ fun SettingsScreenContent(
         }
     )
 
-    val aodEnabled by vm.aodEnabledFlow.collectAsState(false)
     ListItem(
       headlineContent = { Text("Enable AOD (Always-On Display)") },
       supportingContent = { Text("Show timer overlay on lock screen (Beta)") },
@@ -403,7 +406,6 @@ fun SettingsScreenContent(
         .padding(horizontal = 16.dp),
       color = MaterialTheme.colorScheme.primary,
     )
-    val audioMaskingEnabled by vm.audioMaskingEnabledFlow.collectAsState(false)
     
     ListItem(
       headlineContent = { Text("Enable White Noise") },

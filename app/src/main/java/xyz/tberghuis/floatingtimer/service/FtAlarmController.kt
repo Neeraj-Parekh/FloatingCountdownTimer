@@ -37,7 +37,7 @@ class FtAlarmController(
   private var vibrate: Boolean? = null
   private var sound: Boolean? = null
   private var ringtoneDuration: Long? = null
-  private var customSoundName: String? = null
+  private var customName: String? = null
   private var flashEnabled: Boolean = false
   private var flashColor: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Red
 
@@ -63,7 +63,7 @@ class FtAlarmController(
     }
     floatingService.scope.launch {
       prefs.customSoundNameFlow.collectLatest {
-        customSoundName = it
+        customName = it
       }
     }
     floatingService.scope.launch {
