@@ -45,6 +45,13 @@ class RingtoneScreenVm(private val application: Application) : AndroidViewModel(
       customSoundManager.deleteCustomSound(soundFile.name)
       refreshCustomSounds()
   }
+  
+  fun previewCustomSound(name: String) {
+      val file = customSoundManager.getSoundFile(name)
+      file?.let {
+          ringtonePreviewVmc.ringtoneClick(it.toURI().toString())
+      }
+  }
 
   // Audio Looping
   val audioLoopingFlow = prefRepo.audioLoopingFlow

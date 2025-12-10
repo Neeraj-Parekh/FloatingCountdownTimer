@@ -134,7 +134,7 @@ fun RingtoneScreenContent(
                     .weight(1f)
                     .clickable {
                         vm.setCustomSound(soundFile.name)
-                        // TODO: Preview custom sound
+                        vm.previewCustomSound(soundFile.name)
                     },
                 overflow = TextOverflow.Ellipsis,
                 softWrap = false,
