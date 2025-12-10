@@ -10,12 +10,13 @@ import xyz.tberghuis.floatingtimer.DB_FILENAME
 
 @Database(
   entities = [
-      SavedTimer::class,
+      SavedCountdown::class,
+      SavedStopwatch::class,
       Reflection::class,
       Task::class,
       SessionLog::class
   ],
-  version = 7,
+  version = 8,
   exportSchema = true,
   autoMigrations = [
     AutoMigration(from = 1, to = 2),
@@ -23,11 +24,13 @@ import xyz.tberghuis.floatingtimer.DB_FILENAME
     AutoMigration(from = 3, to = 4),
     AutoMigration(from = 4, to = 5),
     AutoMigration(from = 5, to = 6),
-    AutoMigration(from = 6, to = 7)
+    AutoMigration(from = 6, to = 7),
+    AutoMigration(from = 7, to = 8)
   ]
 )
 abstract class AppDatabase : RoomDatabase() {
-  abstract fun savedTimerDao(): SavedTimerDao
+  abstract fun savedCountdownDao(): SavedCountdownDao
+  abstract fun savedStopwatchDao(): SavedStopwatchDao
   abstract fun reflectionDao(): ReflectionDao
   abstract fun taskDao(): TaskDao
   abstract fun sessionDao(): SessionDao
