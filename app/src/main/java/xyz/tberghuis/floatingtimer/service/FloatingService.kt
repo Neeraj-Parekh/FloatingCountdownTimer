@@ -24,6 +24,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import xyz.tberghuis.floatingtimer.FOREGROUND_SERVICE_NOTIFICATION_ID
 import xyz.tberghuis.floatingtimer.INTENT_COMMAND
 import xyz.tberghuis.floatingtimer.INTENT_COMMAND_EXIT
@@ -122,7 +123,7 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
 
     // Observe preferences
     scope.launch {
-      application.preferencesRepository.audioMaskingEnabledFlow.collect { enabled ->
+      preferencesRepository.audioMaskingEnabledFlow.collect { enabled: Boolean ->
           // if disabled, stop any playing masking
           if (!enabled) {
               audioMaskingPlayer.stop()
@@ -185,7 +186,7 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
   fun onTimerStarted() {
     acquireWakeLock()
     scope.launch {
-      val enabled = application.preferencesRepository.audioMaskingEnabledFlow.first()
+      val enabled = preferencesRepository.audioMaskingEnabledFlow.first()
       if (enabled) {
         audioMaskingPlayer.playWhiteNoise()
       }

@@ -24,7 +24,6 @@ import xyz.tberghuis.floatingtimer.data.SavedTimer
 import xyz.tberghuis.floatingtimer.data.appDatabase
 import xyz.tberghuis.floatingtimer.data.preferencesRepository
 import xyz.tberghuis.floatingtimer.logd
-import xyz.tberghuis.floatingtimer.service.audio.AudioMaskingPlayer
 import xyz.tberghuis.floatingtimer.service.boundFloatingServiceProvider
 
 class CountdownScreenVm(
@@ -36,7 +35,7 @@ class CountdownScreenVm(
   private val preferencesRepository = application.preferencesRepository
 
   val currentRingtoneVmc =
-    CurrentRingtoneVmc(preferencesRepository.alarmRingtoneUriFlow, viewModelScope, application)
+    CurrentRingtoneVmc(preferencesRepository.alarmRingtoneUriFlow, preferencesRepository.customSoundNameFlow, viewModelScope, application)
 
   val vibrationFlow = preferencesRepository.vibrationFlow
 
