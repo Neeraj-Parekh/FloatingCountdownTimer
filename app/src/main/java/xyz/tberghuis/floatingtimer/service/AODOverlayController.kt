@@ -32,37 +32,48 @@ class AODOverlayController(private val service: FloatingService) {
         if (aodView != null) return // Already showing
 
         service.scope.launch {
-            val aodEnabled = service.application.preferencesRepository.aodEnabledFlow.first()
-            if (!aodEnabled) return@launch
-            
-            val params = WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                else
-                    WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-                PixelFormat.TRANSLUCENT
-            )
-            params.gravity = Gravity.CENTER
-
-            val view = ComposeView(service).apply {
-                setContent {
-                    AODScreen()
-                }
-            }
-            
             try {
-                windowManager.addView(view, params)
-                aodView = view
+                val aodEnabled = service.application.preferencesRepository.aodEnabledFlow.first()
+                if (!aodEnabled) {
+                    logd("AOD is disabled in preferences")
+                    return@launch
+                }
+                
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    val params = WindowManager.LayoutParams(
+                        WindowManager.LayoutParams.MATCH_PARENT,
+                        WindowManager.LayoutParams.MATCH_PARENT,
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                        else
+                            @Suppress("DEPRECATION")
+                            WindowManager.LayoutParams.TYPE_PHONE,
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED,
+                        PixelFormat.TRANSLUCENT
+                    )
+                    params.gravity = Gravity.CENTER
+
+                    val view = ComposeView(service).apply {
+                        setContent {
+                            AODScreen()
+                        }
+                    }
+                    
+                    try {
+                        windowManager.addView(view, params)
+                        aodView = view
+                        logd("AOD overlay shown successfully")
+                    } catch (e: Exception) {
+                        logd("Error adding AOD view: ${e.message}")
+                        e.printStackTrace()
+                    }
+                }
             } catch (e: Exception) {
-                logd("Error adding AOD view: ${e.message}")
+                logd("Error in showAODOverlay: ${e.message}")
+                e.printStackTrace()
             }
         }
     }

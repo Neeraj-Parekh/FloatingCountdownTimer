@@ -184,16 +184,25 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
   }
 
   fun onTimerStarted() {
+    logd("onTimerStarted called")
     acquireWakeLock()
     scope.launch {
-      val enabled = preferencesRepository.audioMaskingEnabledFlow.first()
-      if (enabled) {
-        audioMaskingPlayer.playWhiteNoise()
+      try {
+        val enabled = preferencesRepository.audioMaskingEnabledFlow.first()
+        logd("Audio masking enabled: $enabled")
+        if (enabled) {
+          logd("Starting white noise playback")
+          audioMaskingPlayer.playWhiteNoise()
+        }
+      } catch (e: Exception) {
+        logd("Error starting audio masking: ${e.message}")
+        e.printStackTrace()
       }
     }
   }
 
   fun onTimerStopped() {
+    logd("onTimerStopped called")
     audioMaskingPlayer.stop()
     releaseWakeLock()
   }

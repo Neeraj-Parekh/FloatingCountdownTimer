@@ -116,21 +116,6 @@ fun SettingsScreenContent(
       .verticalScroll(rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    ListItem(
-      headlineContent = { Text(stringResource(R.string.premium_upgrade)) },
-      modifier = Modifier.clickable {
-        navController.navigate("premium")
-      },
-      supportingContent = {
-        val t = when (purchased) {
-          true -> stringResource(R.string.unlocked)
-          false -> stringResource(R.string.locked)
-          null -> ""
-        }
-        Text(t)
-      },
-    )
-
     HorizontalDivider()
     Text(
       stringResource(R.string.timer),
@@ -229,12 +214,7 @@ fun SettingsScreenContent(
         sharedVm.saveTimerPositions()
       })
       
-    ListItem(
-      headlineContent = { Text("End-of-Day Reflection") },
-      supportingContent = { Text("Journal your productivity") },
-      modifier = Modifier.clickable {
-        navController.navigate("reflection")
-      })
+
 
     HorizontalDivider()
     Text(
@@ -305,10 +285,11 @@ fun SettingsScreenContent(
 
     ListItem(
       headlineContent = { Text("Timer Visual Style") },
+      supportingContent = { Text("Change the countdown animation") },
       trailingContent = {
         Box {
             Text(
-                visualStyle.name,
+                visualStyle.displayName,
                 modifier = Modifier
                     .clickable { expanded = true }
                     .padding(8.dp)
@@ -319,7 +300,7 @@ fun SettingsScreenContent(
             ) {
                 xyz.tberghuis.floatingtimer.data.TimerVisualStyle.values().forEach { style ->
                     androidx.compose.material3.DropdownMenuItem(
-                        text = { Text(style.name) },
+                        text = { Text(style.displayName) },
                         onClick = {
                             vm.updateVisualStyle(style)
                             expanded = false
@@ -432,19 +413,6 @@ fun SettingsScreenContent(
         .padding(top = 16.dp)
         .padding(horizontal = 16.dp),
       color = MaterialTheme.colorScheme.primary,
-    )
-    ListItem(
-      headlineContent = { Text(stringResource(R.string.play_store)) },
-      modifier = Modifier.clickable {
-        context.openPlayStorePage()
-      },
-      supportingContent = { Text(stringResource(R.string.leave_a_review)) },
-      trailingContent = {
-        Icon(
-          Icons.Default.OpenInBrowser,
-          contentDescription = "open",
-        )
-      },
     )
     ListItem(
       headlineContent = { Text(stringResource(R.string.github_issues)) },

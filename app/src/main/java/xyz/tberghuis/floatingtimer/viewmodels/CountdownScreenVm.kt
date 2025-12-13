@@ -99,22 +99,27 @@ class CountdownScreenVm(
     savedTimer: SavedTimer? = null
   ) {
     viewModelScope.launch(IO) {
-      if (shouldShowPremiumDialogMultipleTimers(application)) {
-        withContext(Main) {
-          premiumVmc.showPurchaseDialog = true
+      try {
+        if (shouldShowPremiumDialogMultipleTimers(application)) {
+          withContext(Main) {
+            premiumVmc.showPurchaseDialog = true
+          }
+          return@launch
         }
-        return@launch
+        val autoStart = preferencesRepository.autoStartFlow.first()
+        boundFloatingService.provideService().overlayController.addCountdown(
+          durationSeconds = totalSecs,
+          haloColor = haloColor,
+          timerShape = timerShape,
+          label = label,
+          isBackgroundTransparent = isBackgroundTransparent,
+          start = autoStart,
+          savedTimer = savedTimer,
+        )
+      } catch (e: Exception) {
+        logd("Error creating countdown: ${e.message}")
+        e.printStackTrace()
       }
-      val autoStart = preferencesRepository.autoStartFlow.first()
-      boundFloatingService.provideService().overlayController.addCountdown(
-        durationSeconds = totalSecs,
-        haloColor = haloColor,
-        timerShape = timerShape,
-        label = label,
-        isBackgroundTransparent = isBackgroundTransparent,
-        start = autoStart,
-        savedTimer = savedTimer,
-      )
     }
   }
 

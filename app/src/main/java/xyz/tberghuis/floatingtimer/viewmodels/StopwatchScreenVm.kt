@@ -68,21 +68,26 @@ class StopwatchScreenVm(
     savedTimer: SavedTimer? = null
   ) {
     viewModelScope.launch(IO) {
-      if (shouldShowPremiumDialogMultipleTimers(application)) {
-        withContext(Main) {
-          premiumVmc.showPurchaseDialog = true
+      try {
+        if (shouldShowPremiumDialogMultipleTimers(application)) {
+          withContext(Main) {
+            premiumVmc.showPurchaseDialog = true
+          }
+          return@launch
         }
-        return@launch
+        val autoStart = preferencesRepository.autoStartFlow.first()
+        boundFloatingService.provideService().overlayController.addStopwatch(
+          haloColor = haloColor,
+          timerShape = timerShape,
+          label = label,
+          isBackgroundTransparent = isBackgroundTransparent,
+          start = autoStart,
+          savedTimer = savedTimer,
+        )
+      } catch (e: Exception) {
+        logd("Error creating stopwatch: ${e.message}")
+        e.printStackTrace()
       }
-      val autoStart = preferencesRepository.autoStartFlow.first()
-      boundFloatingService.provideService().overlayController.addStopwatch(
-        haloColor = haloColor,
-        timerShape = timerShape,
-        label = label,
-        isBackgroundTransparent = isBackgroundTransparent,
-        start = autoStart,
-        savedTimer = savedTimer,
-      )
     }
   }
 
