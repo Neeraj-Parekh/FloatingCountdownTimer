@@ -67,18 +67,29 @@ fun ColumnScope.TimerShapeChoice(vm: TimerShapeChoiceVm) {
       .padding(10.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(stringResource(R.string.shape_label))
+    Text(
+      stringResource(R.string.shape_label),
+      color = androidx.compose.ui.graphics.Color.White
+    )
     Column {
-      Row {
+      Row(verticalAlignment = Alignment.CenterVertically) {
         RadioButton(
           selected = vm.timerShape == "circle",
           onClick = { vm.timerShape = "circle" },
           modifier = Modifier,
+          colors = androidx.compose.material3.RadioButtonDefaults.colors(
+            selectedColor = xyz.tberghuis.floatingtimer.ui.theme.AccentOrange,
+            unselectedColor = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.6f)
+          )
         )
         Icon(
           Icons.Outlined.Circle,
           contentDescription = stringResource(R.string.circle),
-          modifier = Modifier.size(40.dp)
+          modifier = Modifier.size(40.dp),
+          tint = if (vm.timerShape == "circle") 
+            xyz.tberghuis.floatingtimer.ui.theme.AccentOrange 
+          else 
+            androidx.compose.ui.graphics.Color.White.copy(alpha = 0.6f)
         )
 
         RadioButton(
@@ -87,14 +98,22 @@ fun ColumnScope.TimerShapeChoice(vm: TimerShapeChoiceVm) {
           modifier = Modifier
             .semantics { testTagsAsResourceId = true }
             .testTag("RectangleRadio"),
+          colors = androidx.compose.material3.RadioButtonDefaults.colors(
+            selectedColor = xyz.tberghuis.floatingtimer.ui.theme.AccentOrange,
+            unselectedColor = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.6f)
+          )
         )
         Icon(
           Icons.Outlined.Rectangle,
           contentDescription = stringResource(R.string.rectangle),
-          modifier = Modifier.size(40.dp)
+          modifier = Modifier.size(40.dp),
+          tint = if (vm.timerShape == "rectangle") 
+            xyz.tberghuis.floatingtimer.ui.theme.AccentOrange 
+          else 
+            androidx.compose.ui.graphics.Color.White.copy(alpha = 0.6f)
         )
       }
-      Row {
+      Row(verticalAlignment = Alignment.CenterVertically) {
         RadioButton(
           selected = vm.timerShape == "label",
           onClick = {
@@ -102,6 +121,10 @@ fun ColumnScope.TimerShapeChoice(vm: TimerShapeChoiceVm) {
             vm.timerShape = "label"
           },
           modifier = Modifier,
+          colors = androidx.compose.material3.RadioButtonDefaults.colors(
+            selectedColor = xyz.tberghuis.floatingtimer.ui.theme.AccentOrange,
+            unselectedColor = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.6f)
+          )
         )
         TextField(
           value = labelTfvState.value,
@@ -121,6 +144,16 @@ fun ColumnScope.TimerShapeChoice(vm: TimerShapeChoiceVm) {
           enabled = vm.timerShape == "label",
           label = { Text(stringResource(R.string.label)) },
           singleLine = true,
+          colors = androidx.compose.material3.TextFieldDefaults.colors(
+            focusedTextColor = androidx.compose.ui.graphics.Color.White,
+            unfocusedTextColor = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f),
+            focusedContainerColor = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.1f),
+            unfocusedContainerColor = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.05f),
+            focusedIndicatorColor = xyz.tberghuis.floatingtimer.ui.theme.AccentOrange,
+            unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.3f),
+            focusedLabelColor = xyz.tberghuis.floatingtimer.ui.theme.AccentOrange,
+            unfocusedLabelColor = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.6f)
+          )
         )
       }
     }

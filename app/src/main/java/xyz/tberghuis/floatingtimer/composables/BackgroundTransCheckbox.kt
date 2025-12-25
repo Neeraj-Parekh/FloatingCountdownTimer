@@ -39,8 +39,16 @@ fun ColumnScope.BackgroundTransCheckbox(
       onCheckedChange = {
         vm.isBackgroundTransparent = it
       },
+      colors = androidx.compose.material3.CheckboxDefaults.colors(
+        checkedColor = xyz.tberghuis.floatingtimer.ui.theme.AccentOrange,
+        uncheckedColor = Color.White.copy(alpha = 0.6f),
+        checkmarkColor = Color.White
+      )
     )
-    Text(stringResource(R.string.transparent_background))
+    Text(
+      stringResource(R.string.transparent_background),
+      color = Color.White
+    )
   }
 }
 
